@@ -1,0 +1,34 @@
+<launch>
+
+  <!-- Load hardware configuration and parameters-->
+  <param name="robot_description"
+      command="$(find xacro)/xacro '$(find jelly_descriptions)/robots/jelly.urdf.xacro'" />
+  
+  <rosparam
+    file="$(find jelly_bringup)/config/robot_parameters.yaml"
+    command="load" />
+
+  <!-- mqtt_bridge args -->
+  <arg name="use_tls" default="false" />
+	
+  <node name="mqtt_bridge" pkg="mqtt_bridge" type="mqtt_bridge_node.py" output="screen">
+          <rosparam command="delete" param="" />
+          <rosparam command="load" file="$(find mqtt_bridge)/config/mqtt_params.yaml" />
+          <rosparam if="$(arg use_tls)" command="load" ns="mqtt" file="$(find mqtt_bridge)/config/tls_mqtt_params.yaml" />
+  </node>
+
+  <arg
+    name="gui"
+    default="True" />
+  <param
+    name="use_gui"
+    value="$(arg gui)" />
+  <node
+    name="robot_state_publisher"
+    pkg="robot_state_publisher"
+    type="state_publisher" />
+  <node
+    name="joint_state_publisher"
+    pkg="joint_state_publisher"
+    type="joint_state_publisher" />
+</launch>
